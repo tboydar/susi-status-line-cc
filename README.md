@@ -1,5 +1,7 @@
 # 🍣 Sushi Status Line for Claude Code
 
+![Sushi belt demo](assets/demo.gif)
+
 Claude Code 的 status line 變成一條迴轉壽司輸送帶：每秒 🍣🍱🍤 從左往右流過，中間隨機空隙，idle 時也會動。
 
 ## 預覽

@@ -25,12 +25,16 @@ FAKE_INPUT='{
   }
 }'
 
-trap 'printf "\nbye 🍣\n"; exit 0' INT
+trap 'printf "\n\nbye 🍣\n"; exit 0' INT
 
+printf "═══ 🍣 Sushi Belt Preview (Ctrl+C 離開) ═══\n\n"
+
+first=1
 while true; do
-  clear
-  echo "═══ 🍣 Sushi Belt Preview (Ctrl+C 離開) ═══"
-  echo
+  if [ -z "$first" ]; then
+    printf "\033[2A\033[J"   # 上移 2 行並清除到螢幕底，原地更新不閃爍
+  fi
+  first=
   echo "$FAKE_INPUT" | bash "$SCRIPT"
   sleep 1
 done
