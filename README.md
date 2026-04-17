@@ -26,6 +26,19 @@ Claude Code 的 status line 變成一條迴轉壽司輸送帶：每秒 🍣🍱�
 
 ---
 
+## 相容性
+
+| 平台 | 狀態 |
+|---|---|
+| macOS | ✅ 實測可用 |
+| Linux | 🤔 語法上 POSIX 相容，**尚未實測**，歡迎回報 |
+| Windows（WSL / Git Bash） | 🤔 理論可行，尚未實測 |
+| Windows（原生 PowerShell） | ❌ 不支援（腳本是 bash） |
+
+主腳本只用 `bash` + `jq` + `date` + `awk` + `printf`，刻意避開 BSD-only 指令（例如 `stat -f`、`sed -i ""`、`date -r`），所以 Linux 理論上能直接跑。實測後歡迎開 issue 回報結果。
+
+---
+
 ## 從零開始安裝
 
 ### 1. 先有 Claude Code
@@ -248,6 +261,16 @@ susi-status-line-cc/
 ## 命名小註
 
 repo 叫 `susi`（故意留俏皮的拼法），腳本內檔名跟註解用 `sushi`。請勿驚慌，是同一隻壽司。
+
+## 歡迎許願 / 回報
+
+喜歡的話、用起來卡關、想到新口味（拉麵車、啤酒輸送帶、行星軌道？）都歡迎：
+
+- 🐛 bug、平台相容性（Linux / WSL 實測）：[開 issue](https://github.com/tboydar/susi-status-line-cc/issues/new)
+- 💡 新功能、新主題、排版想法：一樣開 issue 聊
+- 🍣 PR 非常歡迎——特別是 Linux / WSL 的實測回報、新 emoji 主題包
+
+這是小玩具專案，但既然公開了就持續收 feedback 慢慢長大。
 
 ## 授權
 
