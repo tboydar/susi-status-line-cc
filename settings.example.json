@@ -1,0 +1,7 @@
+{
+  "statusLine": {
+    "type": "command",
+    "command": "/ABSOLUTE/PATH/TO/sushi-statusline.sh",
+    "refreshInterval": 1
+  }
+}
