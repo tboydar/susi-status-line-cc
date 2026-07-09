@@ -22,6 +22,12 @@ Claude Code 的 status line 變成一條迴轉壽司輸送帶：每秒 🍣🍱�
 📁 my-project | 🌿 main | 🥢 Opus 4.7 | 💰$0.1234 | 📐26% | 🕐09:49:31
 ```
 
+Claude Code 有回傳 `rate_limits` 時，會多一段用量（5 小時、7 天、5 小時額度重設時間）：
+
+```
+📁 my-project | 🌿 main (+3) | 🥢 Opus 4.7 | 💰$0.1234 | 📐26% | 🟢 5h:12% 7d:34% ↻14:30 | 🕐09:49:31
+```
+
 > 想看動畫版？見本 repo `assets/demo.tape`，用 [vhs](https://github.com/charmbracelet/vhs) 可以自動產生 GIF。
 
 ---
@@ -35,7 +41,15 @@ Claude Code 的 status line 變成一條迴轉壽司輸送帶：每秒 🍣🍱�
 | Windows（WSL / Git Bash） | 🤔 理論可行，尚未實測 |
 | Windows（原生 PowerShell） | ❌ 不支援（腳本是 bash） |
 
-主腳本只用 `bash` + `jq` + `date` + `awk` + `printf`，刻意避開 BSD-only 指令（例如 `stat -f`、`sed -i ""`、`date -r`），所以 Linux 理論上能直接跑。實測後歡迎開 issue 回報結果。
+主腳本只用 `bash` + `jq` + `date` + `awk` + `printf`，並避開 `stat -f`、`sed -i ""` 這類 BSD-only 指令，所以 Linux 理論上能直接跑。實測後歡迎開 issue 回報結果。
+
+唯一的平台分歧是把 rate limit 的 `resets_at`（unix epoch）格式化成 `HH:MM`：BSD 用 `date -r <epoch>`，GNU coreutils 的 `date -r` 卻是讀「檔案 mtime」、要改用 `date -d @<epoch>`。腳本兩種都試：
+
+```bash
+fmt_hhmm() { date -r "$1" +"%H:%M" 2>/dev/null || date -d "@$1" +"%H:%M" 2>/dev/null; }
+```
+
+兩者都失敗時就不顯示 `↻`，其餘欄位照常。
 
 ---
 
@@ -206,7 +220,15 @@ h3=$(pos_mod $(( slot_id * 40503 + 2246822519 )) "$NUM_ITEMS")
 BELT="${BELT}${SUSHI[$h2]}${ITEMS[$h3]} "
 ```
 
-記得用快取檔存掃描結果，不要每次渲染都 I/O。
+記得用快取檔存掃描結果，不要每次渲染都 I/O。**但寫快取要用「暫存檔 + `mv`」，別直接 `> "$CACHE"`。** Claude Code 每次事件都會重繪 status line，多個 session 還會同時跑；就地截斷再逐行寫，另一個行程就可能讀到半截檔案——最慘讀到 0 行，畫面閃一下空清單。
+
+```bash
+tmp="${CACHE}.$$"
+{ ...掃描... } > "$tmp"
+mv -f "$tmp" "$CACHE"    # 同一個檔案系統內的 mv 是原子操作，讀者只會看到舊的或新的
+```
+
+這不是理論風險：12 個併發實例在冷快取下讀取，就地寫入版有 55/60 次讀到殘缺內容（其中 35 次讀到 0 筆），換成 `mv` 後 60/60 正確。
 
 ### 換成拉麵、啤酒、行星……
 
